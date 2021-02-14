@@ -10,4 +10,8 @@ export default {
     auth_error(state) {
         state.status = 'error'
     },
+    logout(state) {
+        state.status = ''
+        state.token = ''
+    }
 };
