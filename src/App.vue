@@ -1,32 +1,52 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
-  </div>
+  <v-app>
+    <app-header v-if="isLoggedIn"></app-header>
+    <v-main>
+      <router-view />
+    </v-main>
+  </v-app>
 </template>
 
+<script>
+import AppHeader from "./components/AppHeader";
+import { mapGetters } from "vuex";
+
+export default {
+  name: "App",
+
+  components: {
+    AppHeader,
+  },
+  computed: {
+    ...mapGetters("auth", {
+      isLoggedIn: "isLoggedIn",
+    }),
+  },
+  created: function () {
+    this.$http.interceptors.response.use(
+      (response) => {
+        if (response.status === 200 || response.status === 201) {
+          return Promise.resolve(response);
+        } else {
+          return Promise.reject(response);
+        }
+      },
+      (err) => {
+        if (err.response.status) {
+          switch (err.response.status) {
+            case 401:
+              this.$store.dispatch("auth/logout");
+              break;
+
+            default:
+              break;
+          }
+        }
+      }
+    );
+  },
+};
+</script>
+
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
 </style>
