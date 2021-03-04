@@ -148,7 +148,6 @@ export default {
       switch (this.step) {
         case 1:
           this.$emit("close");
-
           break;
         case 2:
           this.step--;
